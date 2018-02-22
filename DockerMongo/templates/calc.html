@@ -112,10 +112,26 @@
   </div> <!-- row -->
 </form>
 
+<br />
+
+<!--TODO Submit button -->
+<!-- <div class="row">
+  <div class="col-xs-6 text-center"> -->
+<input type="button" id="Submit" value="Submit" />
+<input type="button" id="Display" value="Display" />
+<!-- </div> </div> -->
+    
+    
+
+
 <script type="text/javascript">
 
   var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
   var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
+  var SUBMIT_URL = SCRIPT_ROOT + "/new";
+  var DISPLAY_URL = SCRIPT_ROOT + "/todo";
+
+  //TODO function that activates on button, calls /new for each control
 
   // Pass calctimes a <td> element containing the data for a control.
   // It extracts the distance and calls the server to get times to
@@ -168,6 +184,26 @@
              // Then calculate times for this entry
              calc_times(control_entry);
           });
+
+      $("#Submit").click(
+        function() {
+          $("tr.control").each(
+            function() {
+              var mi = control.find("input[name='miles']").val();
+              var km = control.find("input[name='km']").val();
+              var loc = control.find("input[name='location']").val();
+              var open = control.find("input[name='open']").val();
+              var close = control.find("input[name='close']").val();
+
+              $.getJSON(SUBMIT_URL, { mi: mi, km: km, loc: loc, open: open, close: close });
+            });
+
+        });
+
+      $("#Display").click(
+        function() {
+          $.getJSON(DISPLAY_URL);
+        });
 
      });   // end of what we do on document ready
 

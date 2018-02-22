@@ -8,10 +8,13 @@ Replacement for RUSA ACP brevet time calculator
 import os
 from flask import Flask, redirect, url_for, request, render_template
 from pymongo import MongoClient
+import config
 
 app = Flask(__name__)
+CONFIG = config.configuration()
 
-client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
+#TODO delete from cred.ini: MONGO_URL = CONFIG.MONGO_URL
+client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)#TODO, connect=False)  #TODO MONGO_URL)  #TODO os.environ['DB_PORT_27017_TCP_ADDR'], 27017, connect=False)
 db = client.tododb
 
 
@@ -22,15 +25,15 @@ import flask
 #from flask import request  # Already imported above
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
-import config
+#import config
 
 import logging
 
 ###
 # Globals
 ###
-app = flask.Flask(__name__)
-CONFIG = config.configuration()
+#app = flask.Flask(__name__)  # Already assigned above
+#CONFIG = config.configuration()
 app.secret_key = CONFIG.SECRET_KEY
 
 ###
@@ -94,15 +97,27 @@ def todo():
 
     return render_template('todo.html', items=items)
 
-@app.route('/new', methods=['POST'])
+@app.route('/new')  #TODO removed methods=['POST']
 def new():
+    mi = request.args.get('mi', type=str)
+    km = request.args.get('km', type=str)
+    loc = request.args.get('loc', type=str)
+    open_time = request.args.get('open', type=str)
+    close_time = request.args.get('close', type=str)
+
+    name = "Control point at " + mi + "mi/" + km + "km"
+    if loc == "Optional location name":  # If the location is the placeholder, don't include it
+        desc = "Open time: " + open_time + " | Close time: " + close_time
+    else:
+        desc = "Location: " + loc + " | Open time: " + open_time + " | Close time: " + close_time
+
     item_doc = {
-        'name': request.form['name'],
-        'description': request.form['description']
+        'name': name, #request.form['name'],
+        'description': desc #request.form['description']
     }
     db.tododb.insert_one(item_doc)
 
     return redirect(url_for('todo'))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(port=CONFIG.PORT, host='0.0.0.0', debug=True)

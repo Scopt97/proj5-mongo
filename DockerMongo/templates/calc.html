@@ -187,13 +187,28 @@
 
       $("#Submit").click(
         function() {
+          var foundEmpty = false;
+          var foundTimes = false;
           $("tr.control").each(
             function() {
-              var mi = control.find("input[name='miles']").val();
-              var km = control.find("input[name='km']").val();
-              var loc = control.find("input[name='location']").val();
-              var open = control.find("input[name='open']").val();
-              var close = control.find("input[name='close']").val();
+              var mi = $(this).find("input[name='miles']").val();
+              var km = $(this).find("input[name='km']").val();
+              var loc = $(this).find("input[name='location']").val();
+              var open = $(this).find("input[name='open']").val();
+              var close = $(this).find("input[name='close']").val();
+
+              console.log(open + "***" + close);
+
+              if((open === "") || (close === "")) {
+                if (!(foundEmpty) && !(foundTimes)) {  // Only show alert on first empty found
+                  alert("Open or close time empty, please try again");
+		  foundEmpty = true;
+                }
+                return;
+              }
+              else {
+                foundTimes = true;
+              }
 
               $.getJSON(SUBMIT_URL, { mi: mi, km: km, loc: loc, open: open, close: close });
             });

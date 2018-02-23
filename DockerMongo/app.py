@@ -73,14 +73,21 @@ def _calc_times():
     brevet_dist = request.args.get('brev', type=float)
     start_date = request.args.get('date', type=str)
     start_time = request.args.get('time', type=str)
-    print("*********", request.args)
+    #print("*********", request.args)
     app.logger.debug("km={}".format(km))
     app.logger.debug("request.args: {}".format(request.args))
     start_iso = start_date + 'T' + start_time + ':00'
-    print("***start_iso: ", start_iso)
+    #print("***start_iso: ", start_iso)
     open_time = acp_times.open_time(km, brevet_dist, start_iso)
     close_time = acp_times.close_time(km, brevet_dist, start_iso)
-    result = {"open": open_time, "close": close_time}
+
+    open_time_parts = open_time.split("+")
+    close_time_parts = close_time.split("+")
+
+    open_time_no_tz = open_time_parts[0]  # the open time without timezone part (caused issues with moment.js)
+    close_time_no_tz = close_time_parts[0]
+
+    result = {"open": open_time_no_tz, "close": close_time_no_tz}
     return flask.jsonify(result=result)
 
 

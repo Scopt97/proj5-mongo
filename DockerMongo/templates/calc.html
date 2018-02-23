@@ -114,12 +114,12 @@
 
 <br />
 
-<!--TODO Submit button -->
-<!-- <div class="row">
-  <div class="col-xs-6 text-center"> -->
+
+<!-- Submit and Display bottons -->
 <input type="button" id="Submit" value="Submit" />
-<input type="button" id="Display" value="Display" />
-<!-- </div> </div> -->
+<form id="entry" method="POST" action="/todo">
+    <input type="submit" name="Display" value="Display" id="Display" />
+ </form>
     
     
 
@@ -146,12 +146,19 @@
     var open_time_field = control.find("input[name='open']");
     var close_time_field = control.find("input[name='close']");
 
+    if (km === "") {  // If the distance has been deleted, show no time/date
+      open_time_field.val("");
+      close_time_field.val("");
+      return;
+    }
+
     $.getJSON(TIME_CALC_URL, { km: km, brev: brev, date: date, time: time},
       // response handler
       function(data) {
          var times = data.result;
          console.log("Got a response: " +  times);
          console.log("Response.open = " + times.open); //Contains correct time, something goes wrong in the conversion to human readable below
+         console.log("Response.close = " + times.close);
          open_time_field.val( moment(times.open).format("ddd M/D H:mm"));
          close_time_field.val( moment(times.close).format("ddd M/D H:mm"));
        } // end of handler function
@@ -187,10 +194,15 @@
 
       $("#Submit").click(
         function() {
-          var foundEmpty = false;
-          var foundTimes = false;
+          var foundEmpty = false;  // found empty time in table
+          var foundTimes = false;  // found time in table
+          var foundNeg = false;  // found negative control distance
+          var foundLong = false;  // found control point that is too long
           $("tr.control").each(
             function() {
+              var brev = $("#brevet_dist_km").val();
+              var date = $("#begin_date").val();
+              var time = $("#begin_time").val();
               var mi = $(this).find("input[name='miles']").val();
               var km = $(this).find("input[name='km']").val();
               var loc = $(this).find("input[name='location']").val();
@@ -199,8 +211,8 @@
 
               console.log(open + "***" + close);
 
-              if((open === "") || (close === "")) {
-                if (!(foundEmpty) && !(foundTimes)) {  // Only show alert on first empty found
+              if((open === "") || (close === "")) {  // If either time/date is empty, alert
+                if (!(foundEmpty) && !(foundTimes)) {  // Only show alert on first empty found, and not after finding valid entries
                   alert("Open or close time empty, please try again");
 		  foundEmpty = true;
                 }
@@ -210,15 +222,27 @@
                 foundTimes = true;
               }
 
+              if ((km < 0) && !(foundNeg)) {  // If a control distance is negative, alert
+                alert("Control distance cannot be negative");
+                foundNeg = true;
+                return;
+              }
+
+              if ((km > (brev*1.2)) && !(foundLong)) {  // If a control distance is too long, alert
+                alert("Control point distance cannot be more than 20% longer than the total brevet distance");
+                foundNeg = true;
+                return;
+              }
+
               $.getJSON(SUBMIT_URL, { mi: mi, km: km, loc: loc, open: open, close: close });
             });
 
         });
 
-      $("#Display").click(
+      /*TODO$("#Display").click(
         function() {
           $.getJSON(DISPLAY_URL);
-        });
+        });*/
 
      });   // end of what we do on document ready
 

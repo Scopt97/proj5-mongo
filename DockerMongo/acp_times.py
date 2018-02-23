@@ -41,6 +41,11 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
 
     for pair in open_table:
         dist, max_speed = pair
+
+        if control_dist_km == 0:
+            open_delay = 0
+            break
+
         try:
             next_dist, next_max_speed = open_table[i+1]
         except:
@@ -121,6 +126,11 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
 
     for pair in close_table:
         dist, max_speed = pair
+
+        if control_dist_km == 0:
+            close_delay = 1  # The start point stays open for 1 hour
+            break
+
         try:
             next_dist, next_max_speed = close_table[i+1]
         except:

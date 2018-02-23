@@ -90,7 +90,7 @@ def _calc_times():
 
 
 
-@app.route('/todo')  # Changed from '/'
+@app.route('/todo', methods=['POST'])  # Changed from '/'
 def todo():
     _items = db.tododb.find()
     items = [item for item in _items]

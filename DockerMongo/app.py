@@ -113,7 +113,7 @@ def new():
     close_time = request.args.get('close', type=str)
 
     name = "Control point at " + mi + "mi/" + km + "km"
-    if loc == "Optional location name":  # If the location is the placeholder, don't include it
+    if loc == "":  # If the location is tempty, don't include it
         desc = "Open time: " + open_time + " | Close time: " + close_time
     else:
         desc = "Location: " + loc + " | Open time: " + open_time + " | Close time: " + close_time

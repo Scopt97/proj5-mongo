@@ -1,0 +1,40 @@
+# Case 1
+Input:
+	Distance: 200km
+	Begins at: 01/01/2017 12:00 AM
+	Km: 100, Location: Oregon
+	Km: 200
+	click "Submit"
+	click "Display"
+Expect:
+	name:  Control point at 62.1mi/100km
+
+	  description:  Location: Oregon | Open time: Sun 1/1 2:56 | Close time: Sun 1/1 6:40
+
+	name:  Control point at 124.3mi/200km
+
+	  description:  Open time: Sun 1/1 5:53 | Close time: Sun 1/1 13:30
+
+
+# Case 2
+Input:
+	No control
+	click "Submit"
+Expect:
+	alert message
+
+
+# Case 3
+Input:
+	negative control distance
+	click "Submit"
+Expect:
+	alert message
+
+
+# Case 4
+Input:
+	control distance more than 20% longer than the brevet distance
+	click "Submit"
+Expect:
+	alert message

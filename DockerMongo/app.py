@@ -115,9 +115,10 @@ def new():
         'name': name, #request.form['name'],
         'description': desc #request.form['description']
     }
+
     db.tododb.insert_one(item_doc)
 
-    return redirect(url_for('todo'))
+    return "Something" #TODO redirect(url_for('todo'))
 
 if __name__ == "__main__":
     app.run(port=CONFIG.PORT, host='0.0.0.0', debug=True)

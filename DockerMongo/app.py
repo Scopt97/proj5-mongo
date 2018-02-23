@@ -8,13 +8,10 @@ Replacement for RUSA ACP brevet time calculator
 import os
 from flask import Flask, redirect, url_for, request, render_template
 from pymongo import MongoClient
-import config
 
 app = Flask(__name__)
-CONFIG = config.configuration()
 
-#TODO delete from cred.ini: MONGO_URL = CONFIG.MONGO_URL
-client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)#TODO, connect=False)  #TODO MONGO_URL)  #TODO os.environ['DB_PORT_27017_TCP_ADDR'], 27017, connect=False)
+client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
 
 
@@ -22,18 +19,16 @@ db = client.tododb
 # Start code from flask_brevets.py
 
 import flask
-#from flask import request  # Already imported above
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
-#import config
+import config
 
 import logging
 
 ###
 # Globals
 ###
-#app = flask.Flask(__name__)  # Already assigned above
-#CONFIG = config.configuration()
+CONFIG = config.configuration()
 app.secret_key = CONFIG.SECRET_KEY
 
 ###
@@ -104,7 +99,7 @@ def todo():
 
     return render_template('todo.html', items=items)
 
-@app.route('/new')  #TODO removed methods=['POST']
+@app.route('/new')
 def new():
     mi = request.args.get('mi', type=str)
     km = request.args.get('km', type=str)
@@ -119,13 +114,13 @@ def new():
         desc = "Location: " + loc + " | Open time: " + open_time + " | Close time: " + close_time
 
     item_doc = {
-        'name': name, #request.form['name'],
-        'description': desc #request.form['description']
+        'name': name,
+        'description': desc
     }
 
     db.tododb.insert_one(item_doc)
 
-    return "Something" #TODO redirect(url_for('todo'))
+    return "Something"
 
 if __name__ == "__main__":
     app.run(port=CONFIG.PORT, host='0.0.0.0', debug=True)
